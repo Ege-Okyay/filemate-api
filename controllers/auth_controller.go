@@ -6,6 +6,7 @@ import (
 	"github.com/Ege-Okyay/filemate-api/models"
 	"github.com/Ege-Okyay/filemate-api/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -23,6 +24,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	user.Password = string(hashedPassword)
+	user.ID = uuid.New()
 
 	db := utils.GetDB()
 	result := db.Create(&user)
