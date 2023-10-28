@@ -22,6 +22,7 @@ func InitDB() {
 	}
 
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.File{})
 }
 
 func GetDB() *gorm.DB {
