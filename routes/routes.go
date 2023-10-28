@@ -17,10 +17,10 @@ func SetupRouter() *gin.Engine {
 		auth.POST("/login", controllers.Login)
 	}
 
-	private := r.Group("/private")
-	private.Use(authMiddleware.MiddlewareFunc())
+	file := r.Group("/file")
+	file.Use(authMiddleware.MiddlewareFunc())
 	{
-		private.GET("/user", controllers.UserProfile)
+		file.POST("/upload", controllers.UploadFile)
 	}
 
 	return r
