@@ -13,7 +13,7 @@ import (
 func SignUp(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing credentials"})
 		return
 	}
 
@@ -37,22 +37,26 @@ func SignUp(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	var loginData struct {
+		Identifier string `json:"identifier"`
+		Password   string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&loginData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing credentials"})
 		return
 	}
 
 	db := utils.GetDB()
 
 	var foundUser models.User
-	result := db.Where("username = ?", user.Username).First(&foundUser)
+	result := db.Where("username = ? OR email = ?", loginData.Identifier, loginData.Identifier).First(&foundUser)
 	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong username or email"})
 		return
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(user.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginData.Password))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect password"})
 		return
