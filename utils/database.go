@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Ege-Okyay/filemate-api/models"
 	_ "github.com/go-sql-driver/mysql"
@@ -11,8 +12,7 @@ import (
 var db *gorm.DB
 
 func InitDB() {
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
-	dsn := "root:@tcp(127.0.0.1:3306)/filemate?parseTime=true"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 
 	var err error
 	db, err = gorm.Open("mysql", dsn)
