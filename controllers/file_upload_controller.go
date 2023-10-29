@@ -96,6 +96,38 @@ func UploadFile(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Files uploaded successfully"})
 }
 
+func DeleteFile(c *gin.Context) {
+	fileID := c.Query("fileId")
+
+	if fileID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing file id"})
+		return
+	}
+
+	db := utils.GetDB()
+
+	var foundFile models.File
+	fileResult := db.Where("id = ?", fileID).First(&foundFile)
+	if fileResult.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		return
+	}
+
+	err := os.Remove(foundFile.FilePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while deleting file from server"})
+		return
+	}
+
+	deleteResult := db.Delete(&foundFile)
+	if deleteResult.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while deleting file from database"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted the file"})
+}
+
 func GetFiles(c *gin.Context) {
 	userID := c.GetString("userId")
 
