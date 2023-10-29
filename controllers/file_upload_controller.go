@@ -128,6 +128,34 @@ func DeleteFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted the file"})
 }
 
+func DownloadFile(c *gin.Context) {
+	fileID := c.Query("fileId")
+
+	if fileID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing file id"})
+		return
+	}
+
+	db := utils.GetDB()
+
+	var foundFile models.File
+	result := db.Where("id = ?", fileID).First(&foundFile)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		return
+	}
+
+	filePath := foundFile.FilePath
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Dispoistion", "attachment filename="+foundFile.FileName)
+	c.Header("Content-Type", "application/octet-stream")
+	c.Header("Content-Transfer_Encoding", "binary")
+	c.Header("Expires", "0")
+
+	c.File(filePath)
+}
+
 func GetFiles(c *gin.Context) {
 	userID := c.GetString("userId")
 
