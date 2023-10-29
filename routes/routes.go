@@ -21,6 +21,7 @@ func SetupRouter() *gin.Engine {
 	file.Use(authMiddleware.MiddlewareFunc())
 	{
 		file.POST("/upload", controllers.UploadFile)
+		file.GET("/files", controllers.GetFiles)
 	}
 
 	return r

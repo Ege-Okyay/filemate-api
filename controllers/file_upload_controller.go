@@ -95,3 +95,18 @@ func UploadFile(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Files uploaded successfully"})
 }
+
+func GetFiles(c *gin.Context) {
+	userID := c.GetString("userId")
+
+	db := utils.GetDB()
+
+	var foundFiles []models.File
+	result := db.Where("user_id = ?", userID).Find(&foundFiles)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while getting files"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"files": result.Value})
+}
