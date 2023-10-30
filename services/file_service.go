@@ -3,27 +3,22 @@ package services
 import (
 	"github.com/Ege-Okyay/filemate-api/models"
 	"github.com/Ege-Okyay/filemate-api/utils"
-	"github.com/jinzhu/gorm"
 )
 
-var db *gorm.DB
+func CreateFileRecord(record models.File) error {
+	db := utils.GetDB()
 
-func init() {
-	db = utils.GetDB()
-}
-
-func CreateFileRecords(fileRecords []models.File) error {
-	for _, record := range fileRecords {
-		result := db.Create(&record)
-		if result.Error != nil {
-			return result.Error
-		}
+	result := db.Create(&record)
+	if result.Error != nil {
+		return result.Error
 	}
 
 	return nil
 }
 
 func FindFileByID(fileID string) (*models.File, error) {
+	db := utils.GetDB()
+
 	var foundFile models.File
 	result := db.Where("id = ?", fileID).First(&foundFile)
 	if result.Error != nil {
@@ -34,6 +29,8 @@ func FindFileByID(fileID string) (*models.File, error) {
 }
 
 func DeleteFileRecord(file *models.File) error {
+	db := utils.GetDB()
+
 	deleteResult := db.Delete(file)
 	if deleteResult.Error != nil {
 		return deleteResult.Error
@@ -43,6 +40,8 @@ func DeleteFileRecord(file *models.File) error {
 }
 
 func UpdateFileStatus(file *models.File, public bool) error {
+	db := utils.GetDB()
+
 	err := db.Model(file).Update("public", public)
 	if err.Error != nil {
 		return err.Error
@@ -52,6 +51,8 @@ func UpdateFileStatus(file *models.File, public bool) error {
 }
 
 func FindFilesByUserID(userID string) ([]models.File, error) {
+	db := utils.GetDB()
+
 	var foundFiles []models.File
 	result := db.Where("user_id = ?", userID).Find(&foundFiles)
 	if result.Error != nil {

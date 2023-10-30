@@ -87,10 +87,12 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	err = services.CreateFileRecords(fileRecords)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file details"})
-		return
+	for _, record := range fileRecords {
+		err = services.CreateFileRecord(record)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file details"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Files uploaded successfully"})
@@ -152,20 +154,20 @@ func DownloadFile(c *gin.Context) {
 	c.File(filePath)
 }
 
-func MakeFilePublic(c *gin.Context) {
+func ChangeFilePublicty(c *gin.Context) {
 	var err error
 
 	fileID := c.Query("fileId")
-	newStatus := c.Query("status")
+	newStatus := c.Query("public")
+
+	if fileID == "" || newStatus == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing query data"})
+		return
+	}
 
 	newStatusValue, err := strconv.ParseBool(newStatus)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Status value parsing error"})
-		return
-	}
-
-	if fileID == "" || newStatus == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing query data"})
 		return
 	}
 
@@ -181,7 +183,13 @@ func MakeFilePublic(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully made the file public"})
+	if newStatusValue == false {
+		c.JSON(http.StatusOK, gin.H{"message": "Successfully made the file private"})
+		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "Successfully made the file public"})
+		return
+	}
 }
 
 func GetFiles(c *gin.Context) {
