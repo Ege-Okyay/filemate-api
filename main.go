@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Ege-Okyay/filemate-api/routes"
@@ -11,6 +12,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal("Error loading .env file")
 	}
 
