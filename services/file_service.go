@@ -42,8 +42,8 @@ func DeleteFileRecord(file *models.File) error {
 	return nil
 }
 
-func UpdateFileShareStatus(file *models.File, shared bool) error {
-	err := db.Model(file).Update("shared", shared)
+func UpdateFileStatus(file *models.File, public bool) error {
+	err := db.Model(file).Update("public", public)
 	if err.Error != nil {
 		return err.Error
 	}
