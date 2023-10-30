@@ -4,10 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Ege-Okyay/filemate-api/models"
-	"github.com/Ege-Okyay/filemate-api/utils"
+	"github.com/Ege-Okyay/filemate-api/services"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func SignUp(c *gin.Context) {
@@ -17,18 +15,8 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	err := services.CreateUser(&user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": " Failed to process password"})
-		return
-	}
-
-	user.Password = string(hashedPassword)
-	user.ID = uuid.New()
-
-	db := utils.GetDB()
-	result := db.Create(&user)
-	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
@@ -47,23 +35,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	db := utils.GetDB()
-
-	var foundUser models.User
-	result := db.Where("username = ? OR email = ?", loginData.Identifier, loginData.Identifier).First(&foundUser)
-	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong username or email"})
+	foundUser, err := services.AuthenticateUser(loginData.Identifier, loginData.Password)
+	if err.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Context})
 		return
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginData.Password))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect password"})
-		return
-	}
-
-	token, err := utils.GenerateToken(foundUser.ID.String())
-	if err != nil {
+	var tokenErr error
+	token, tokenErr := services.GenerateToken(foundUser.ID.String())
+	if tokenErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
