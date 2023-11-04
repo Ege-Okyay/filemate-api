@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SignUp signs user in if there aren't any errors while validating credentials.
+// It takes user model fields from the POST request and returns a JSON with the suitable HTTP code and a message or error.
 func SignUp(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -15,9 +17,25 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	err := services.CreateUser(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+	checkCredentials, usernameFound, emailFound := services.CheckForTakenCredentials(&user)
+	if checkCredentials.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": checkCredentials.Context})
+		return
+	}
+
+	if usernameFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		return
+	}
+
+	if emailFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
+		return
+	}
+
+	createUser := services.CreateUser(&user)
+	if createUser.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": createUser.Context})
 		return
 	}
 
