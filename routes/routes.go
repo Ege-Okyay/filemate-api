@@ -9,6 +9,8 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
+	r.Use(middleware.CorsMiddleware())
+
 	authMiddleware := middleware.AuthMiddleware()
 
 	auth := r.Group("/auth")

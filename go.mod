@@ -14,6 +14,7 @@ require (
 	github.com/creack/pty v1.1.20 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gohugoio/hugo v0.119.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
