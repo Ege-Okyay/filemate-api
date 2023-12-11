@@ -72,7 +72,7 @@ func AuthenticateUser(identifier string, password string) (*models.User, ReturnE
 	// Compare the provided password with the hashed password in the database.
 	err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(password))
 	if err != nil {
-		return nil, ReturnError{Error: err, Context: "Incorrect password"}
+		return nil, ReturnError{Error: err, Context: "Wrong password"}
 	}
 
 	return &foundUser, ReturnError{}

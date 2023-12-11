@@ -13,7 +13,7 @@ import (
 func SignUp(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing credentials"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing credentials."})
 		return
 	}
 
@@ -24,12 +24,12 @@ func SignUp(c *gin.Context) {
 	}
 
 	if usernameFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists."})
 		return
 	}
 
 	if emailFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists."})
 		return
 	}
 
@@ -39,7 +39,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Successfully signed up"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Successfully signed up, please login to continue."})
 }
 
 func Login(c *gin.Context) {
@@ -66,7 +66,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged in", "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged in...", "token": token})
 }
 
 func UserProfile(c *gin.Context) {
