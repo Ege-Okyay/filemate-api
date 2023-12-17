@@ -1,9 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
-	"net/http"
-
 	"github.com/Ege-Okyay/filemate-api/controllers"
 	"github.com/Ege-Okyay/filemate-api/middleware"
 	"github.com/gin-gonic/gin"
@@ -15,24 +12,6 @@ func SetupRouter() *gin.Engine {
 	r.Use(middleware.CorsMiddleware())
 
 	authMiddleware := middleware.AuthMiddleware()
-
-	r.GET("/health-check", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{})
-		return
-	})
-
-	r.POST("/post-check", func(ctx *gin.Context) {
-		var reqBody map[string]interface{}
-
-		err := json.NewDecoder(ctx.Request.Body).Decode(&reqBody)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{"body": reqBody})
-		return
-	})
 
 	auth := r.Group("/auth")
 	{
