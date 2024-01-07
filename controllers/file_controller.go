@@ -144,9 +144,10 @@ func DownloadFile(c *gin.Context) {
 	}
 
 	filePath := foundFile.FilePath
+	contentDispositionHeader := fmt.Sprintf("attachment; filename=\"%s\";", foundFile.FileName)
 
 	c.Header("Content-Description", "File Transfer")
-	c.Header("Content-Dispoistion", "attachment filename="+foundFile.FileName)
+	c.Header("Content-Disposition", contentDispositionHeader)
 	c.Header("Content-Type", "application/octet-stream")
 	c.Header("Content-Transfer_Encoding", "binary")
 	c.Header("Expires", "0")
