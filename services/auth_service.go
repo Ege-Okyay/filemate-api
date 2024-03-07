@@ -1,9 +1,13 @@
 package services
 
 import (
+	"context"
+	"time"
+
 	"github.com/Ege-Okyay/filemate-api/config"
 	"github.com/Ege-Okyay/filemate-api/models"
 	"github.com/dgrijalva/jwt-go"
+	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,16 +17,25 @@ func SignUp(username string, email string, password string) error {
 		return err
 	}
 
-	user := models.User{Username: username, Email: email, Password: string(hashedPassword)}
-	if err := config.DB.Create(&user).Error; err != nil {
+	user := models.User{Username: username, Email: email, Password: string(hashedPassword), CreatedAt: time.Now(), UpdatedAt: time.Now()}
+
+	ctx := context.TODO()
+	_, err = config.UserCollection.InsertOne(ctx, user)
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func Login(email string, password string) (string, error) {
 	var user models.User
-	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
+
+	ctx := context.TODO()
+	filter := bson.M{"email": email}
+
+	err := config.UserCollection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
 		return "", err
 	}
 

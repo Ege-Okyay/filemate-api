@@ -1,26 +1,42 @@
 package config
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
-	"github.com/Ege-Okyay/filemate-api/models"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *gorm.DB
+var Client *mongo.Client
+
+var UserCollection *mongo.Collection
 
 func ConnectDB() {
 	dsn := fmt.Sprintf(
-		"postgres://default:%s@ep-green-mode-a2eum8tp.eu-central-1.aws.neon.tech:5432/verceldb?sslmode=require",
-		os.Getenv("DB_SECRET"))
+		"mongodb+srv://%s:%s@cluster0.fvfflwp.mongodb.net/%s?retryWrites=true&w=majority&appName=Cluster0",
+		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	clientOptions := options.Client().ApplyURI(dsn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var err error
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		panic("Failed to connect to database")
+		log.Fatal(err)
 	}
-	DB = db
 
-	DB.AutoMigrate(&models.User{})
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal("Failed to connect to MongoDB: ", err)
+	}
+
+	userCollection := client.Database("Filemate").Collection("users")
+
+	UserCollection = userCollection
+	Client = client
 }
