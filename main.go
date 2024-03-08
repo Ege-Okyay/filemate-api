@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/Ege-Okyay/filemate-api/config"
 	"github.com/Ege-Okyay/filemate-api/controllers"
 	"github.com/gofiber/fiber/v2"
@@ -18,8 +21,9 @@ func main() {
 	app := fiber.New()
 
 	config.ConnectDB()
+	config.InitFirebase()
 
 	setupRoutes(app)
 
-	app.Listen(":3000")
+	app.Listen(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
