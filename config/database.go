@@ -14,6 +14,7 @@ import (
 var Client *mongo.Client
 
 var UserCollection *mongo.Collection
+var FileCollection *mongo.Collection
 
 func ConnectDB() {
 	dsn := fmt.Sprintf(
@@ -36,7 +37,10 @@ func ConnectDB() {
 	}
 
 	userCollection := client.Database("Filemate").Collection("users")
+	fileCollection := client.Database("Filemate").Collection("files")
 
 	UserCollection = userCollection
+	FileCollection = fileCollection
+
 	Client = client
 }
