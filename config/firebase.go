@@ -12,11 +12,11 @@ import (
 var FirebaseApp *firebase.App
 
 func InitFirebase() {
-	ctx := context.Background()
-	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_ACCOUNT_KEY_PATH"))
-	app, err := firebase.NewApp(ctx, nil, opt)
+	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CREDENTIALS_PATH"))
+	config := &firebase.Config{ProjectID: os.Getenv("FIREBASE_PROJECT_ID")}
+	app, err := firebase.NewApp(context.Background(), config, opt)
 	if err != nil {
-		log.Fatalf("Error initializing Firebase app: %v\n", err)
+		log.Fatalf("error initializing firebase application: %v\n", err)
 	}
 
 	FirebaseApp = app

@@ -13,6 +13,9 @@ func setupRoutes(app *fiber.App) {
 	auth := app.Group("/auth")
 	auth.Post("/sign-up", controllers.SignUp)
 	auth.Post("/login", controllers.Login)
+
+	file := app.Group("/file")
+	file.Post("/upload", controllers.UploadFile)
 }
 
 func main() {
