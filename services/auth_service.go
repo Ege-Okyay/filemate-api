@@ -44,6 +44,8 @@ func Login(email string, password string) (string, error) {
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user"] = user
 	tokenString, err := token.SignedString(config.SecretKey)
 	if err != nil {
 		return "", err
